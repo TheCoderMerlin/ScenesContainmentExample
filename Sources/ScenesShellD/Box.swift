@@ -2,6 +2,8 @@ import Scenes
 import Igis
 
 class Box : RenderableEntityBase {
+    // It's generally easiest to initialize any objects as part of their declaration,
+    // unless more complex calculations are required
     static let boxSize = Size(width:200, height:100)
     static let handleSize = Size(width:10, height:10)
 
@@ -29,6 +31,9 @@ class Box : RenderableEntityBase {
     let topTextBox     = Text(location:Point(), text:"")
     let bottomTextBox  = Text(location:Point(), text:"")
 
+    // The setup() method is guaranteed to be invoked exactly once per object prior
+    // to calculate() and render().
+    // It enables the object to perform any setup that requires a Canvas.
     override func setup(canvas:Canvas) {
         guard let canvasSize = canvas.canvasSize else {
             fatalError("canvasSize required for setup of Box")
@@ -63,6 +68,8 @@ class Box : RenderableEntityBase {
         bottomTextBox.baseline = .bottom
     }
 
+    // Implementing a separate method to align child objects is a good practice.
+    // This way, any movement of the object can occur by moving the primary object only.
     func alignChildren() {
         // Place handles around box
         let centerX = rectangle.rect.left + rectangle.rect.size.width / 2
@@ -74,6 +81,8 @@ class Box : RenderableEntityBase {
         rightHandle.rect.topLeft.moveTo(x:rectangle.rect.right - rightHandle.rect.size.width, y:centerY - rightHandle.rect.size.height / 2)
     }
 
+    // This method examines the relationship between the box and the target.
+    // It then constructs a description string filtered as specified.
     func containmentString(desiredSet:ContainmentSet) -> String {
         guard let owner = owner as? InteractionLayer else {
             fatalError("Expected InteractionLayer owner to setContainment()")
@@ -144,6 +153,9 @@ class Box : RenderableEntityBase {
         return strings.joined(separator:", ")
     }
 
+    // The calculate function is responsible for positioning objects and setting any other values
+    // for rendering but it may not render itself.
+    // It's invoked by Scenes immediately prior to a render().
     override func calculate(canvasSize:Size) {
         // Position lines
         lineLeft   = Lines(from:Point(x:rectangle.rect.left, y:0), to:Point(x:rectangle.rect.left, y:canvasSize.height))
@@ -171,20 +183,28 @@ class Box : RenderableEntityBase {
         bottomTextBox.text = containmentString(desiredSet:[.beyondBottom, .overlapsBottom, .overlapsVertically, .containedVertically, .beyondVertically, .containedFully, .overlapsFully, .beyondFully, .contact])
     }
     
+    // The render() method is where the drawing to the canvas actually occurs.
+    // Calculations should have occurred previously.
     override func render(canvas:Canvas) {
         canvas.render(lineStyle, lineWidth, lineLeft, lineRight, lineTop, lineBottom)
         canvas.render(fillStyle, rectangle, handleFillStyle, handleStrokeStyle, topHandle, rightHandle, bottomHandle, leftHandle)
         canvas.render(fontFillStyle, leftTextBox, rightTextBox, topTextBox, bottomTextBox)
     }
 
+    // The boundingRect() is used by Scenes as the initial step for hitTesting.
+    // It's required to be implemented if the object desires intereaction with the mouse.
     override func boundingRect() -> Rect {
         return rectangle.rect
     }
 
+    // For this object, we want to respond to both onMouseDrag and onMouseDown events.
     override func wantsMouseEvents() -> MouseEventTypeSet {
         return [.drag, .downUp]
     }
 
+    // This method responds to dragging the mouse.
+    // It either drags the entire object, or, if a click occurs on a handle,
+    // adjusts the size of the boject appropriately.
     override func onMouseDrag(localLocation:Point, movement:Point) {
         switch (localLocation) {
         case (let location) where topHandle.rect.local(to:rectangle.rect).containment(target:location).contains(.containedFully):
@@ -213,6 +233,7 @@ class Box : RenderableEntityBase {
         alignChildren()
     }
 
+    // When this object is clicked upon, we'll move it to the front.
     override func onMouseDown(localLocation:Point) {
         if let owner = owner {
             owner.moveZ(of:self, to:.front)
