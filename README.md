@@ -1,8 +1,6 @@
-# ScenesShellD
+# ScenesContainmentExample
 
-An empty shell to serve as a starting point for using Scenes as a dynamically linked library.
-Before use, build Scenes and Igis and set the LD_LIBRARY_PATH environment variable to include the
-libraries' location.
+This is an example of how one may use Containment to detect the intersection
+of objects.
 
-Then use make.sh to build the project and run.sh to run the project.
-
+![Image of Scenes Containment Example](images/ContainmentExample.png)
