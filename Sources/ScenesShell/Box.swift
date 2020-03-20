@@ -1,11 +1,11 @@
 import Scenes
 import Igis
 
-class Box : RenderableEntityBase {
+class Box : RenderableEntity, EntityMouseDownHandler, EntityMouseDragHandler {
     // It's generally easiest to initialize any objects as part of their declaration,
     // unless more complex calculations are required
     static let boxSize = Size(width:200, height:100)
-    static let handleSize = Size(width:10, height:10)
+    static let handleSize = Size(width:20, height:20)
 
     let font = "12pt Arial"
     let fontFillStyle = FillStyle(color:Color(.black))
@@ -34,11 +34,7 @@ class Box : RenderableEntityBase {
     // The setup() method is guaranteed to be invoked exactly once per object prior
     // to calculate() and render().
     // It enables the object to perform any setup that requires a Canvas.
-    override func setup(canvas:Canvas) {
-        guard let canvasSize = canvas.canvasSize else {
-            fatalError("canvasSize required for setup of Box")
-        }
-
+    override func setup(canvasSize:Size, canvas:Canvas) {
         // Initial position of box at center
         let centerX = canvasSize.width / 2
         let centerY = canvasSize.height / 2
@@ -66,6 +62,14 @@ class Box : RenderableEntityBase {
         bottomTextBox.font = font
         bottomTextBox.alignment = .center
         bottomTextBox.baseline = .bottom
+
+        dispatcher.registerEntityMouseDownHandler(handler:self)
+        dispatcher.registerEntityMouseDragHandler(handler:self)
+    }
+
+    override func teardown() {
+        dispatcher.unregisterEntityMouseDragHandler(handler:self)
+        dispatcher.unregisterEntityMouseDownHandler(handler:self)
     }
 
     // Implementing a separate method to align child objects is a good practice.
@@ -84,10 +88,10 @@ class Box : RenderableEntityBase {
     // This method examines the relationship between the box and the target.
     // It then constructs a description string filtered as specified.
     func containmentString(desiredSet:ContainmentSet) -> String {
-        guard let owner = owner as? InteractionLayer else {
+        guard let layer = layer as? InteractionLayer else {
             fatalError("Expected InteractionLayer owner to setContainment()")
         }
-        let targetRect = owner.target.boundingRect()
+        let targetRect = layer.target.boundingRect()
         let containmentSet = rectangle.rect.containment(target:targetRect)
         let resultantSet = containmentSet.intersection(desiredSet)
 
@@ -197,15 +201,11 @@ class Box : RenderableEntityBase {
         return rectangle.rect
     }
 
-    // For this object, we want to respond to both onMouseDrag and onMouseDown events.
-    override func wantsMouseEvents() -> MouseEventTypeSet {
-        return [.drag, .downUp]
-    }
-
     // This method responds to dragging the mouse.
     // It either drags the entire object, or, if a click occurs on a handle,
     // adjusts the size of the boject appropriately.
-    override func onMouseDrag(localLocation:Point, movement:Point) {
+    func onEntityMouseDrag(globalLocation:Point, movement:Point) {
+        let localLocation = local(fromGlobal:globalLocation)
         switch (localLocation) {
         case (let location) where topHandle.rect.local(to:rectangle.rect).containment(target:location).contains(.containedFully):
             rectangle.rect.top += movement.y
@@ -234,10 +234,8 @@ class Box : RenderableEntityBase {
     }
 
     // When this object is clicked upon, we'll move it to the front.
-    override func onMouseDown(localLocation:Point) {
-        if let owner = owner {
-            owner.moveZ(of:self, to:.front)
-        }
+    func onEntityMouseDown(globalLocation:Point) {
+        layer.moveZ(of:self, to:.front)
     }
 
 }

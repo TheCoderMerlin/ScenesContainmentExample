@@ -6,20 +6,13 @@ class InteractionLayer : Layer {
     let reference : Box
     let target : Target
 
-    override init() {
+    init() {
         reference = Box()
         target = Target()
 
-        super.init()
+        super.init(name:"Interaction")
 
         insert(entity:reference, at:.front)
         insert(entity:target, at:.front)
     }
-
-    // Remember to override this function if mouse events are desired.
-    override func wantsMouseEvents() -> MouseEventTypeSet {
-        return [.drag, .downUp]
-    }
-    
-    
 }

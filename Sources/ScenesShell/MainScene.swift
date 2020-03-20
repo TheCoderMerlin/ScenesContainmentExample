@@ -5,7 +5,7 @@ class MainScene : Scene {
     let backgroundLayer : Layer
     let interactionLayer : Layer
 
-    override init() {
+    init() {
         // Initialize the layers.
         // It's fine to use parameters if desired.
         // At a minimum, most scenes should have a backgroud layer and
@@ -13,7 +13,7 @@ class MainScene : Scene {
         backgroundLayer = BackgroundLayer()
         interactionLayer = InteractionLayer()
 
-        super.init()
+        super.init(name:"Main")
 
         // Insert each layer into the scene.
         // In general this will occur from back to front.
@@ -22,12 +22,4 @@ class MainScene : Scene {
         insert(layer:backgroundLayer, at:.front)
         insert(layer:interactionLayer, at:.front)
     }
-
-    // If mouse events are desired, it's important to override this
-    // method for the scene, as well as any layers and objects
-    // that are interested.
-    override func wantsMouseEvents() -> MouseEventTypeSet {
-        return [.drag, .downUp]
-    }
-    
 }
