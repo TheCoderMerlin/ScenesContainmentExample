@@ -61,7 +61,7 @@ class Target : RenderableEntity, EntityMouseDragHandler, EntityMouseDownHandler 
     // When this object is dragged, we'll move the primary object (the ellipse)
     // and then ask the children to follow.
     func onEntityMouseDrag(globalLocation:Point, movement:Point) {
-        outerEllipse.center.moveBy(offset:movement)
+        outerEllipse.center += movement
         alignChildren()
     }
 

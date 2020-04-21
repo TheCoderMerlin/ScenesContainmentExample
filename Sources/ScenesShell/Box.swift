@@ -40,7 +40,7 @@ class Box : RenderableEntity, EntityMouseDownHandler, EntityMouseDragHandler {
         let centerY = canvasSize.height / 2
     
         let boxTopLeft = Point(x:centerX - rectangle.rect.size.width/2, y:centerY - rectangle.rect.size.height/2)
-        rectangle.rect.topLeft.moveTo(boxTopLeft)
+        rectangle.rect.topLeft = boxTopLeft
         alignChildren()
 
         // Left text box
@@ -79,10 +79,10 @@ class Box : RenderableEntity, EntityMouseDownHandler, EntityMouseDragHandler {
         let centerX = rectangle.rect.left + rectangle.rect.size.width / 2
         let centerY = rectangle.rect.top + rectangle.rect.size.height / 2
         
-        topHandle.rect.topLeft.moveTo(x:centerX - topHandle.rect.size.width / 2, y:rectangle.rect.topLeft.y)
-        bottomHandle.rect.topLeft.moveTo(x:centerX - bottomHandle.rect.size.width / 2, y:rectangle.rect.bottom - bottomHandle.rect.size.height)
-        leftHandle.rect.topLeft.moveTo(x:rectangle.rect.topLeft.x, y:centerY - leftHandle.rect.size.height / 2)
-        rightHandle.rect.topLeft.moveTo(x:rectangle.rect.right - rightHandle.rect.size.width, y:centerY - rightHandle.rect.size.height / 2)
+        topHandle.rect.topLeft    = Point(x:centerX - topHandle.rect.size.width / 2, y:rectangle.rect.topLeft.y)
+        bottomHandle.rect.topLeft = Point(x:centerX - bottomHandle.rect.size.width / 2, y:rectangle.rect.bottom - bottomHandle.rect.size.height)
+        leftHandle.rect.topLeft   = Point(x:rectangle.rect.topLeft.x, y:centerY - leftHandle.rect.size.height / 2)
+        rightHandle.rect.topLeft  = Point(x:rectangle.rect.right - rightHandle.rect.size.width, y:centerY - rightHandle.rect.size.height / 2)
     }
 
     // This method examines the relationship between the box and the target.
@@ -228,7 +228,7 @@ class Box : RenderableEntity, EntityMouseDownHandler, EntityMouseDragHandler {
                 rectangle.rect.right += (Box.handleSize.width * 2 - rectangle.rect.size.width)
             }
         default:
-            rectangle.rect.topLeft.moveBy(offset:movement)
+            rectangle.rect.topLeft += movement
         }
         alignChildren()
     }
